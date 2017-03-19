@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -33,7 +34,7 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
                 new Person(){ Name = "Maitri",Email="Maitri@test.com" }
             };
 
-            var param = Expression.Parameter(typeof (Person), "Person");
+            var param = Expression.Parameter(typeof(Person), "Person");
             var ex = Expression.Property(param, "Email");
             var sort = Expression.Lambda<Func<Person, object>>(ex, param);
             var sortedData = (from s in people select s).OrderBy(sort.Compile()).ToList();
@@ -42,10 +43,10 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
         [TestMethod]
         public void StartsWithExpression()
         {
-            var param = Expression.Parameter(typeof (Person), "person");
+            var param = Expression.Parameter(typeof(Person), "person");
             var ex = Expression.Property(param, "Email");
 
-            var mi = typeof (String).GetMethod("StartsWith", new Type[] {typeof (string)});
+            var mi = typeof(String).GetMethod("StartsWith", new Type[] { typeof(string) });
             var startWithExpr = Expression.Call(ex, mi, Expression.Constant("H"));
             var lambdaExpr = Expression.Lambda<Func<Person, bool>>(startWithExpr, param);
 
@@ -58,7 +59,48 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             };
 
             var searchedData = people.Where(lambdaExpr.Compile()).ToList();
-            Assert.AreEqual(2,searchedData.Count);
+            Assert.AreEqual(2, searchedData.Count);
+        }
+
+        [TestMethod]
+        public void ComplexDivideSectionMethod()
+        {
+
+            //Example
+            Func<IEnumerable<int>, int, bool> dividesectionmethod = (x, y) =>
+            {
+                int nos1 = 0;
+                int nos2 = 0;
+                foreach (int i in x)
+                {
+                    if (i <= y)
+                        nos1++;
+                    else
+                        nos2++;
+                }
+                return nos1 > nos2;
+            };
+
+
+            var enumerableExpression = Expression.Parameter(typeof (IEnumerable<int>), "x");
+            var inEExpression = Expression.Parameter(typeof (int), "y");
+
+            var localvarnos1 = Expression.Variable(typeof (int), "nos1");
+            var localvarnos2 = Expression.Variable(typeof (int), "nos2");
+
+            var zeroCondidtional = Expression.Constant(0);
+
+            var bexplocalnos1 = Expression.Assign(localvarnos1, zeroCondidtional);
+            var bexplocalnos2 = Expression.Assign(localvarnos2, zeroCondidtional);
+
+            var enumerator = Expression.Variable(typeof (IEnumerator<int>), "enumerator");
+
+            var assignEnumerator = Expression.Assign(enumerator,
+                Expression.Call(enumerableExpression, typeof (IEnumerable<int>).GetMethod("GetEnumerator")));
+
+            var moveNext = Expression.Call(enumerator, typeof (IEnumerator).GetMethod("MoveNext"));
+
+
         }
     }
 }
