@@ -38,5 +38,27 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             var sort = Expression.Lambda<Func<Person, object>>(ex, param);
             var sortedData = (from s in people select s).OrderBy(sort.Compile()).ToList();
         }
+
+        [TestMethod]
+        public void StartsWithExpression()
+        {
+            var param = Expression.Parameter(typeof (Person), "person");
+            var ex = Expression.Property(param, "Email");
+
+            var mi = typeof (String).GetMethod("StartsWith", new Type[] {typeof (string)});
+            var startWithExpr = Expression.Call(ex, mi, Expression.Constant("H"));
+            var lambdaExpr = Expression.Lambda<Func<Person, bool>>(startWithExpr, param);
+
+            List<Person> people = new List<Person>
+            {
+                new Person(){ Name = "Pranay",Email="pranay@test.com" },
+                new Person(){ Name = "Heamng",Email="Hemang@test.com" },
+                new Person(){ Name = "Hiral" ,Email="Hiral@test.com"},
+                new Person(){ Name = "Maitri",Email="Maitri@test.com" }
+            };
+
+            var searchedData = people.Where(lambdaExpr.Compile()).ToList();
+            Assert.AreEqual(2,searchedData.Count);
+        }
     }
 }
