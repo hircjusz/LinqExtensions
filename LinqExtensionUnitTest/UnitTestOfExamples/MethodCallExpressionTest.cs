@@ -162,6 +162,7 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             var method = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
 
             var methodCall = Expression.Call(parameter,method, argument);
+
             var lambda = Expression.Lambda<Func<string,bool>>(methodCall, parameter);
             var result=lambda.Compile()("Dish xxxxxx");
 
