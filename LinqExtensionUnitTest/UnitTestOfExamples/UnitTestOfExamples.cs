@@ -102,5 +102,16 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
 
 
         }
+
+        [TestMethod]
+        public void CreateFieldExpression()
+        {
+
+            var horse=new Models.Animal() {Species = "Horse"};
+            var memberExpressiion =  Expression.Field(Expression.Constant(horse), "Species");
+            Assert.AreEqual("Horse",memberExpressiion.Member.Name);
+            
+
+        }
     }
 }
