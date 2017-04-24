@@ -142,11 +142,35 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
 
 
             Expression sinExpr = Expression.Call(
-                typeof (Math).GetMethod("Sin", new[] {typeof (double)}),powExpr);
+                typeof(Math).GetMethod("Sin", new[] { typeof(double) }), powExpr);
 
 
             var result = Expression.Lambda<Func<double, double, double>>(sinExpr, param1, param2).Compile()(2, 2);
-            Assert.AreEqual(Math.Sin(Math.Pow(2,2)), result);
+            Assert.AreEqual(Math.Sin(Math.Pow(2, 2)), result);
+        }
+
+        [TestMethod]
+        public void MethodCallIndexArrayAccess()
+        {
+            string[,] gradeArray =
+    { { "chemistry", "history", "mathematics"},{ "chemistry", "history", "mathematics"}};
+
+            System.Linq.Expressions.Expression arrayExpression =
+    System.Linq.Expressions.Expression.Constant(gradeArray);
+
+            var index0 = 0;
+            var index1 = 2;
+
+            MethodCallExpression methodCallExpression =
+    Expression.ArrayIndex(
+         arrayExpression,
+        Expression.Constant(index0),
+         Expression.Constant(index1));
+            //Expression.ArrayIndex()
+
+            var result = Expression.Lambda<Func<string>>(methodCallExpression).Compile()();
+            Assert.AreEqual(gradeArray[index0, index1], result);
+
         }
 
     }
