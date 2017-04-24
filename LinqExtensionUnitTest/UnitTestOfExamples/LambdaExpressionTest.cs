@@ -31,5 +31,20 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             Assert.AreEqual(bodyExpression.NodeType, ExpressionType.Call);
             Assert.IsNotNull(bodyExpression as MethodCallExpression);
         }
+
+        [TestMethod]
+        public void MethodMemberAccessExpression()
+        {
+            Expression<Func<Person, string>> expr = a => a.Name;
+            var bodyExpression = expr.Body;
+            Assert.AreEqual(bodyExpression.NodeType, ExpressionType.MemberAccess);
+            Assert.IsNotNull(bodyExpression as MemberExpression);
+            Assert.AreEqual(expr.ReturnType,typeof(string));
+            Assert.IsNotNull((bodyExpression as MemberExpression).Member.Name, "Name");
+        }
+
+
+
+
     }
 }
