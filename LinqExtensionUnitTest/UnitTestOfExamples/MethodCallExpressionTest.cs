@@ -129,5 +129,25 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             Assert.AreEqual(4, result);
         }
 
+        [TestMethod]
+        public void MethodCallSinWithParameter()
+        {
+            var param1 = Expression.Parameter(typeof(double), "p");
+            var param2 = Expression.Parameter(typeof(double), "s");
+
+            Expression powExpr = Expression.Call(
+                typeof(Math).GetMethod("Pow", new[] { typeof(double), typeof(double) }),
+                param1,
+                param2);
+
+
+            Expression sinExpr = Expression.Call(
+                typeof (Math).GetMethod("Sin", new[] {typeof (double)}),powExpr);
+
+
+            var result = Expression.Lambda<Func<double, double, double>>(sinExpr, param1, param2).Compile()(2, 2);
+            Assert.AreEqual(Math.Sin(Math.Pow(2,2)), result);
+        }
+
     }
 }
