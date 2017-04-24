@@ -12,6 +12,8 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
     [TestClass]
     public class MethodCallExpressionTest
     {
+        private readonly LambdaExpressionTest _lambdaExpressionTest = new LambdaExpressionTest();
+
         [TestMethod]
         public void CallUpper()
         {
@@ -165,6 +167,5 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
 
             Assert.AreEqual(true,result);
         }
-
     }
 }
