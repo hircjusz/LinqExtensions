@@ -20,6 +20,22 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             Assert.AreEqual(sampleString.ToUpper(), lambda.DynamicInvoke());
         }
 
+        [TestMethod]
+        public void CallContainsParameterInput()
+        {
+            var values = new List<string>() { "PETR", "VALE" };
+            var type = typeof(string);
+            var parameterExp = Expression.Parameter(type, "");
+            var someValue = Expression.Constant(values, typeof(IEnumerable<string>));
+            var containsMethodExp = Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(string) }, someValue, parameterExp);
+            var lamda = Expression.Lambda<Func<string, bool>>(containsMethodExp, parameterExp);
+
+            //ARRANGE
+            var flag=lamda.Compile()("PETR");
+            Assert.IsTrue(flag);
+            var flag2 = lamda.Compile()("PETR2");
+            Assert.IsFalse(flag2);
+        }
 
     }
 }
