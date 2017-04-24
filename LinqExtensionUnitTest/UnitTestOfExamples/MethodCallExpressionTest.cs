@@ -77,46 +77,7 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             //Assert.IsFalse(flag3);
         }
 
-        /*
-         static IEnumerable GetFilteredList(IEnumerable target, string propertyName, IEnumerable searchValues)
-{
-    //Get target's T 
-    var targetType = target.GetType().GetGenericArguments().FirstOrDefault();
-    if (targetType == null)
-        throw new ArgumentException("Should be IEnumerable<T>", "target");
-
-    //Get searchValues's T
-    var searchValuesType = searchValues.GetType().GetGenericArguments().FirstOrDefault();
-    if (searchValuesType == null)
-        throw new ArgumentException("Should be IEnumerable<T>", "searchValues");
-
-    //Create a p parameter with the type T of the items in the -> target IEnumerable<T>
-    var containsLambdaParameter = Expression.Parameter(targetType, "p");
-
-    //Create a property accessor using the property name -> p.#propertyName#
-    var property = Expression.Property(containsLambdaParameter, targetType, propertyName);
-
-    //Create a constant with the -> IEnumerable<T> searchValues
-    var searchValuesAsConstant = Expression.Constant(searchValues, searchValues.GetType());
-
-    //Create a method call -> searchValues.Contains(p.Id)
-    var containsBody = Expression.Call(typeof(Enumerable), "Contains", new[] { searchValuesType }, searchValuesAsConstant, property);
-
-    //Create a lambda expression with the parameter p -> p => searchValues.Contains(p.Id)
-    var containsLambda = Expression.Lambda(containsBody, containsLambdaParameter);
-
-    //Create a constant with the -> IEnumerable<T> target
-    var targetAsConstant = Expression.Constant(target, target.GetType());
-
-    //Where(p => searchValues.Contains(p.Id))
-    var whereBody = Expression.Call(typeof(Enumerable), "Where", new[] { targetType }, targetAsConstant, containsLambda);
-
-    //target.Where(p => searchValues.Contains(p.Id))
-    var whereLambda = Expression.Lambda<Func<IEnumerable>>(whereBody).Compile();
-
-    return whereLambda.Invoke();
-}
-         */
+        
 
         [TestMethod]
         public void MethodCallPowWithConstant()
@@ -187,6 +148,22 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             var result = Expression.Lambda<Func<string>>(methodCallExpression).Compile()();
             Assert.AreEqual(gradeArray[index0, index1], result);
 
+        }
+
+        [TestMethod]
+        public void MethodCallStartsWith()
+        {
+           //var t= "Dish xxx".StartsWith("Dish");
+
+            var parameter = Expression.Parameter(typeof (string), "name");
+            var argument = Expression.Constant("Dish");
+            var method = typeof(string).GetMethod("StartsWith", new[] { typeof(string) });
+
+            var methodCall = Expression.Call(parameter,method, argument);
+            var lambda = Expression.Lambda<Func<string,bool>>(methodCall, parameter);
+            var result=lambda.Compile()("Dish xxxxxx");
+
+            Assert.AreEqual(true,result);
         }
 
     }
