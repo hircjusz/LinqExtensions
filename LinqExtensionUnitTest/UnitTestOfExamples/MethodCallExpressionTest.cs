@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -40,26 +41,41 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
         }
 
 
-        //[TestMethod]
-        //public void CallContainsFilteredList()
-        //{
-        //    //ARRANGE
-        //    var values = new List<Person>() { new Person() { Name = "PETR" }, new Person() { Name = "VALE" } };
-        //    var type = typeof(Person);
-        //    var parameterExp = Expression.Parameter(type, "");
-        //    var propertyExpression = Expression.Property(parameterExp, "Name");
-        //    var someValue = Expression.Constant(values, typeof(IEnumerable<Person>));
-        //    var containsMethodExp = Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(string) }, someValue, propertyExpression);
-        //    var lamda = Expression.Lambda<Func<Person, bool>>(containsMethodExp, parameterExp);
+        [Ignore]
+        public void CallContainsFilteredList()
+        {
+            //ARRANGE
+            var target = new List<Person>() { new Person() { Name = "PETR" }, new Person() { Name = "VALE" } };
 
-        //    //ACT
-        //    var flag = lamda.Compile()("PETR");
-        //    Assert.IsTrue(flag);
-        //    var flag2 = lamda.Compile()("VALE");
-        //    Assert.IsTrue(flag2);
-        //    var flag3 = lamda.Compile()("PETR2");
-        //    Assert.IsFalse(flag3);
-        //}
+            var searchValues = new List<Person>() { new Person() { Name = "PETR" } };
+            var targetType = typeof(Person);
+            var containsLambdaParameter = Expression.Parameter(targetType, "p");
+            var property = Expression.Property(containsLambdaParameter, targetType, "Name");
+            var searchValuesAsConstant = Expression.Constant(searchValues, searchValues.GetType());
+
+            var containsBody = Expression.Call(typeof(Enumerable), "Contains", new[] { typeof(string) }, searchValuesAsConstant, property);
+            //Create a lambda expression with the parameter p -> p => searchValues.Contains(p.Id)
+            var containsLambda = Expression.Lambda(containsBody, containsLambdaParameter);
+
+            //Create a constant with the -> IEnumerable<T> target
+            var targetAsConstant = Expression.Constant(target, target.GetType());
+
+            //Where(p => searchValues.Contains(p.Id))
+            var whereBody = Expression.Call(typeof(List<Person>), "Where", new[] { targetType }, targetAsConstant, containsLambda);
+
+            //target.Where(p => searchValues.Contains(p.Id))
+            var whereLambda = Expression.Lambda<Func<List<Person>>>(whereBody).Compile();
+
+            var result= whereLambda.Invoke();
+
+            //ACT
+            //var flag = lamda.Compile()("PETR");
+            //Assert.IsTrue(flag);
+            //var flag2 = lamda.Compile()("VALE");
+            //Assert.IsTrue(flag2);
+            //var flag3 = lamda.Compile()("PETR2");
+            //Assert.IsFalse(flag3);
+        }
 
         /*
          static IEnumerable GetFilteredList(IEnumerable target, string propertyName, IEnumerable searchValues)
