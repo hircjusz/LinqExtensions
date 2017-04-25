@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace LinqExtensions
 {
-    public class Class1
+    public static class FilterBuilder
     {
     }
 }
