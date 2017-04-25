@@ -43,40 +43,32 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             var bodyExpression = expr.Body;
             Assert.AreEqual(bodyExpression.NodeType, ExpressionType.MemberAccess);
             Assert.IsNotNull(bodyExpression as MemberExpression);
-            Assert.AreEqual(expr.ReturnType,typeof(string));
+            Assert.AreEqual(expr.ReturnType, typeof(string));
             Assert.IsNotNull((bodyExpression as MemberExpression).Member.Name, "Name");
         }
 
-
         [TestMethod]
-        public void MethodLambdaQueryableExpression()
+        public void ExpressionTreeAndAlsoTest1()
         {
+            Expression<Func<Person, bool>> isTeenAgerExpr = s => s.Age > 12 && s.Age < 20;
 
-            Type typeDict = typeof(Dictionary<,>);
+            var pe = Expression.Parameter(typeof(Person));
+            var ageProperty = Expression.Property(pe, "Age");
+            var greaterThan = Expression.GreaterThan(ageProperty, Expression.Constant(12));
+            var lessThan = Expression.LessThan(ageProperty, Expression.Constant(20));
+            var andAlso = Expression.AndAlso(greaterThan, lessThan);
+            var lambda = Expression.Lambda<Func<Person, bool>>(andAlso, pe);
+            var func=lambda.Compile();
 
-            //Creating KeyValue Type for Dictionary.
-            Type[] typeArgs = { typeof(string), typeof(string) };
+            var person10 = new Person() {Age = 10};
+            var person15 = new Person() {Age = 10};
+            var person20 = new Person() {Age = 10};
 
-            //Passing the Type and create Dictionary Type.
-            Type genericType = typeDict.MakeGenericType(typeArgs);
-
-            //Creating Instance for Dictionary<K,T>.
-            IDictionary d = Activator.CreateInstance(genericType) as IDictionary;
-
-
-            //List<Person> person= new List<Person>();
-            //person.Where(p => p.Name == "").AsQueryable();
-
-            //Expression<Action<List<Person>,Action<Person>>> expr= (collection,predicate) =>collection.ForEach(predicate) ;
-            //var bodyExpression = expr.Body;
-            //var parameters = expr.Parameters;
-            ////Assert.AreEqual(bodyExpression.NodeType, ExpressionType.MemberAccess);
-            ////Assert.IsNotNull(bodyExpression as MemberExpression);
-            ////Assert.AreEqual(expr.ReturnType, typeof(string));
-            ////Assert.IsNotNull((bodyExpression as MemberExpression).Member.Name, "Name");
+            var teenFunc = isTeenAgerExpr.Compile();
+            Assert.AreEqual(teenFunc(person10),func(person10));
+            Assert.AreEqual(teenFunc(person15),func(person15));
+            Assert.AreEqual(teenFunc(person20),func(person20));
         }
-
-
 
     }
 }
