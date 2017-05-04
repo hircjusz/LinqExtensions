@@ -27,6 +27,23 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             Assert.IsInstanceOfType(myObj, typeof(Person));
         }
 
+        [TestMethod]
+        public void NewExpressionToCreateTypeConstAsParameter()
+        {
+            var personTest = new Person {Name = "abc", Age = 123};
+            Type anonType = personTest.GetType();
+
+            var exp = Expression.New(
+            anonType.GetConstructor(new[] { typeof(string), typeof(int) }),
+            Expression.Constant("abc"),
+            Expression.Constant(123));
+            var lambda = LambdaExpression.Lambda(exp);
+            Person myObj = lambda.Compile().DynamicInvoke() as Person;
+            Assert.IsNotNull(myObj);
+            Assert.AreEqual(personTest.Name,myObj.Name);
+            Assert.AreEqual(personTest.Age,myObj.Age);
+        }
+
 
     }
 }
