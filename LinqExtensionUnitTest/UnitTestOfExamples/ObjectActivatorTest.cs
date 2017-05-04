@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using LinqExtensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace LinqExtensionUnitTest.UnitTestOfExamples
@@ -14,6 +15,8 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
     [TestClass]
     public class ObjectActivatorTest
     {
+
+       
 
         [TestMethod]
         public void SimpleNewExpressionToCreateType()
@@ -68,6 +71,14 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             Assert.AreEqual(personTest.Age, myObj.Age);
         }
 
+        [TestMethod]
+        public void ObjectActivatorTest1()
+        {
+            var personActivator=  ActivatorUtil.GetActivator<Person>("name",123);
+            var person = personActivator("name", 123);
+            Assert.AreEqual(person.Name,"name");
+            Assert.AreEqual(person.Age,123);
 
+        }
     }
 }
