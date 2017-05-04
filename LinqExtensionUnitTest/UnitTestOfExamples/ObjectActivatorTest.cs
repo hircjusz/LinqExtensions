@@ -44,6 +44,30 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             Assert.AreEqual(personTest.Age,myObj.Age);
         }
 
+        [TestMethod]
+        public void NewExpressionToCreateConfigurableParameter()
+        {
+            //ARRANGE
+            string name = "abc";
+            int age = 123;
+
+            var personTest = new Person { Name = name, Age = age };
+            Type anonType = personTest.GetType();
+
+            var parameterName = Expression.Parameter(typeof (string), "name");
+            var parameterAge = Expression.Parameter(typeof (int), "age");
+
+            var exp = Expression.New(
+            anonType.GetConstructor(new[] { typeof(string), typeof(int) }),
+            parameterName,
+            parameterAge);
+            var lambda = LambdaExpression.Lambda(exp,parameterName,parameterAge);
+            Person myObj = lambda.Compile().DynamicInvoke(name,age) as Person;
+            Assert.IsNotNull(myObj);
+            Assert.AreEqual(personTest.Name, myObj.Name);
+            Assert.AreEqual(personTest.Age, myObj.Age);
+        }
+
 
     }
 }
