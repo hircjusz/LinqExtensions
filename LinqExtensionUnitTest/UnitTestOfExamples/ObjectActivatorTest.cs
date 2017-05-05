@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using LinqExtensions;
@@ -78,6 +79,20 @@ namespace LinqExtensionUnitTest.UnitTestOfExamples
             var person = personActivator("name", 123);
             Assert.AreEqual(person.Name,"name");
             Assert.AreEqual(person.Age,123);
+
+        }
+
+        [TestMethod]
+        public void ObjectGetterAndSetter()
+        {
+            Func<bool> Getter;
+            Action<bool> Setter;
+            PropertyInfo prop = null;
+            Getter = Expression.Lambda<Func<bool>>(Expression.Property(null, prop)).Compile();
+            ParameterExpression value = Expression.Parameter(typeof(bool));
+            Setter = Expression.Lambda<Action<bool>>(
+                Expression.Assign(Expression.Property(null, prop), value), value).Compile();
+
 
         }
     }
